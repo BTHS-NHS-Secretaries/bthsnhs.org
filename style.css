@@ -147,7 +147,7 @@ footer {
 }
 
 #banner-image{
-  width: 500px;
+  width:850px;
   object-fit: cover;
   justify-content: center;
   margin: auto;
@@ -238,6 +238,36 @@ a{
 
 .dropDownTrackerItem :hover{
   text-decoration: underline;
+}
+.execs-section {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.execs-title {
+  font-size: 24px; /* Bigger font size */
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase; /* Optional: makes it all caps */
+}
+
+.execs-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.exec {
+  width: 250px; /* Adjust the width */
+  text-align: center;
+}
+
+.exec-photo {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
 }
 
 .watchnow{

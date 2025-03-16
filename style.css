@@ -24,6 +24,49 @@ body {
   color: #ffffff; /* White text */
   line-height: 1.6;
 }
+.values-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center the boxes horizontally */
+  gap: 5px; /* Reduced gap between the boxes */
+  margin-top: 20px;
+}
+
+.value {
+  flex: 1;
+  min-width: 130px; /* Smaller minimum width for boxes */
+  max-width: 180px; /* Smaller maximum width for boxes */
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #333;
+  margin: 0; /* Ensure no extra margin between boxes */
+}
+
+.value h4 {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.value p {
+  font-size: 1rem;
+  color: #333;
+}
+
+.event-photos {
+  display: flex;
+  justify-content: center; /* Center the event photos */
+  margin-top: 20px;
+}
+
+.event-photo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
 header {
   text-align: center;

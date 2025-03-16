@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <title>BTHS NHS</title>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playwrite+BR:wght@100..400&display=swap');
+    </style>
+    
+</head>
+
+<body>
+    <header>
+
+        <!--logo  -->
+        <div class="container">
+            <div>
+                <img id="logo-image" src="logo.png" alt="BTHS NHS Logo">
+            </div>
+            <!-- menu  -->
+
+            <nav class="navbar">
+                <ul class="nav links">
+                    <li class="nav-link">
+                        <a class = "current" href="#index.html">Home</a>
+                    </li>
+                    <li class="nav-link login">
+                        <a href="login.html"> Member Points </a>
+                    
+                    </li>
+                    
+                    <li class="nav-link execs">
+                        <a href="execs.html"> Executive Board </a>
+                    </li>
+                    <li class="nav-link about">
+                        <a href=about.html> About </a>
+                    
+
+                    </li>
+                    <li class="nav-link">
+                        <a href=contact.html> Contact </a>
+                    </li>
+                </ul>
+
+            </nav>
+        </div>
+
+
+        </div>
+
+
+        <hr/>
+
+
+        <h3><i>The Brooklyn Technical High School National Honor Society serves to recognize those students who have demonstrated excellence that upholds the four pillars of character, leadership, scholarship, and service. Our purpose is to provide services to the school community and New York City, whether it is through volunteering, tutoring students, mentoring, assisting school faculty, or helping out during major school events.</i></h3>
+        <div id="bannerWrap"><img id="banner-image" src="_VZ53338.JPG" alt="Executive Photo"></div>
+        <h2> Our Pillars </h2>
+        <p><strong>Character:</strong>
+            Valuing diverse cultures and building relationships that reflect love of self but also concern for others. There are endless attributes to good character: perseverance, respect, integrity, honesty, sacrifice—the list goes on.
+        </p> 
+        <p>
+            <strong>Leadership:</strong>
+            Carrying oneself with dignity and taking ownership and responsibility for one's own actions and participation. eadership means being an agent—someone who takes action and responsibility—of your own pathway.
+        </p>  
+        <p>
+            <strong>Scholarship:</strong>
+            A commitment to learning and growing on an educational path. It means making the most of the educational opportunities provided and seeking out learning, not only in school or similar settings, but also personally.
+        </p>   
+        <p>
+            <strong> Service:</strong>
+            Seeking out and engaging in meaningful service. It calls for a service mindset, the desire to seek opportunities to help others as well as acts of service.
+        </p>
+    </header>
+  
+
+    <footer>
+        <p>© 2024 BTHS NHS. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTHS NHS Login</title>
+</head>
+<body>
+    <div id="login">
+        <form id="emailForm">
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { readCSV } from "./utils.js";
+
+        const emailForm = document.getElementById("emailForm");
+        const emailInput = document.getElementById("email");
+
+        emailForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+
+            if (email) {
+                try {
+                    const members = await readCSV("./members.csv");
+                    const member = members.find((m) => m.Email.toLowerCase() === email.toLowerCase());
+
+                    if (member) {
+                        // Store user data in localStorage
+                        localStorage.setItem('userData', JSON.stringify(member));
+                        // Redirect to the dashboard page
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert("Email not found. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Error reading CSV:", error);
+                }
+            }
+        });
+    </script>
+</body>
+</html> -->

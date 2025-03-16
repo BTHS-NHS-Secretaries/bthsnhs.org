@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>BTHS NHS - Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #003366;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div>
+                <img id="logo-image" src="logo.png" alt="BTHS NHS Logo">
+            </div>
+            <nav class="navbar">
+                <ul class="nav links">
+                    <li class="nav-link"><a href="index.html">Home</a></li>
+                    <li class="nav-link login"><a class="current" href="dashboard.html">Member Points</a></li>
+                    <li class="nav-link execs"><a href="execs.html">Executive Board</a></li>
+                    <li class="nav-link about"><a href="about.html">About</a></li>
+                    <li class="nav-link"><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+        <hr />
+    </header>
+    <div class="dashboard-content">
+        <h2>Welcome, <span id="userName"></span></h2>
+        <div class="dashboard-details">
+            <p><strong>Committee:</strong> <span id="userCommittee"></span></p>
+            <p><strong>Total General Points:</strong> <span id="generalPointsTotal"></span></p>
+            <p><strong>Total Committee Points:</strong> <span id="committeePointsTotal"></span></p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Points Earned</th>
+                </tr>
+            </thead>
+            <tbody id="pointsTableBody"></tbody>
+        </table>
+    </div>
+    <footer>
+        <p>© 2024 BTHS NHS. All rights reserved.</p>
+    </footer>
+    <script type="module">
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData) {
+            document.getElementById("userName").textContent = `${userData["First Name"]} ${userData["Last Name"]}`;
+            document.getElementById("userCommittee").textContent = userData["Committee"];
+            document.getElementById("generalPointsTotal").textContent = userData["Total General Points"] || 0;
+            document.getElementById("committeePointsTotal").textContent = userData["Total Committee Points"] || 0;
+            
+            // Filter out keys that shouldn't be displayed in the table
+            const events = Object.keys(userData).filter(key => 
+                key !== "First Name" && 
+                key !== "Last Name" && 
+                key !== "Committee" && 
+                key !== "Email" && 
+                key !== "Graduating Class" && 
+                key !== "Prefect" && 
+                key !== "Total General Points" && 
+                key !== "Total Committee Points"
+            );
+
+            const tableBody = document.getElementById("pointsTableBody");
+            
+            // Loop through the filtered keys and add rows to the table
+            events.forEach((event, index) => {
+                if (index > 0) {  // Skip the first column (index 0)
+                    const row = document.createElement("tr");
+                    const eventCell = document.createElement("td");
+                    eventCell.textContent = event;  // Event name in the first column
+                    const pointsCell = document.createElement("td");
+                    pointsCell.textContent = userData[event] || 0;  // Points for the event in the second column
+                    row.appendChild(eventCell);
+                    row.appendChild(pointsCell);
+                    tableBody.appendChild(row);
+                }
+            });
+        } else {
+            alert("No user data found. Please log in.");
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

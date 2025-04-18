@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./logo.png" type="image/x-icon">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>BTHS NHS - Dashboard</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
@@ -15,9 +13,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             text-align: center;
             padding: 20px;
+        }
+        .dashboard-details {
+            margin-bottom: 20px;
+        }
+        .point-summary {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 10px 0;
         }
         table {
             width: 80%;
@@ -35,7 +41,6 @@
         }
     </style>
 </head>
-
 <body>
     <header>
         <div class="container">
@@ -54,13 +59,17 @@
         </div>
         <hr />
     </header>
+
     <div class="dashboard-content">
         <h1>Welcome, <span id="userName"></span></h1>
         <div class="dashboard-details">
             <p><strong>Committee:</strong> <span id="userCommittee"></span></p>
-            <p><strong>Total General Points:</strong> <span id="generalPointsTotal"></span></p>
-            <p><strong>Total Committee Points:</strong> <span id="committeePointsTotal"></span></p>
+            <div class="point-summary">
+                <p><strong>Total General Points:</strong> <span id="generalPointsTotal"></span></p>
+                <p><strong>Total Committee Points:</strong> <span id="committeePointsTotal"></span></p>
+            </div>
         </div>
+
         <table>
             <thead>
                 <tr>
@@ -70,50 +79,117 @@
             </thead>
             <tbody id="pointsTableBody"></tbody>
         </table>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Committee Events</th>
+                    <th>Points Earned</th>
+                </tr>
+            </thead>
+            <tbody id="committeePointsTableBody"></tbody>
+        </table>
     </div>
+
     <footer>
         <p>© 2024 BTHS NHS. All rights reserved.</p>
     </footer>
+
     <script type="module">
         const userData = JSON.parse(localStorage.getItem('userData'));
-        if (userData) {
-            document.getElementById("userName").textContent = `${userData["First Name"]} ${userData["Last Name"]}`;
-            document.getElementById("userCommittee").textContent = userData["Committee"];
-            document.getElementById("generalPointsTotal").textContent = userData["Total General Points"] || 0;
-            document.getElementById("committeePointsTotal").textContent = userData["Total Committee Points"] || 0;
-            
-            // Filter out keys that shouldn't be displayed in the table
-            const events = Object.keys(userData).filter(key => 
-                key !== "First Name" && 
-                key !== "Last Name" && 
-                key !== "Committee" && 
-                key !== "Email" && 
-                key !== "Graduating Class" && 
-                key !== "Prefect" && 
-                key !== "Total General Points" && 
-                key !== "Total Committee Points"
-            );
 
-            const tableBody = document.getElementById("pointsTableBody");
-            
-            // Loop through the filtered keys and add rows to the table
-            events.forEach((event, index) => {
-                if (index > 0) {  // Skip the first column (index 0)
-                    const row = document.createElement("tr");
-                    const eventCell = document.createElement("td");
-                    eventCell.textContent = event;  // Event name in the first column
-                    const pointsCell = document.createElement("td");
-                    pointsCell.textContent = userData[event] || 0;  // Points for the event in the second column
-                    row.appendChild(eventCell);
-                    row.appendChild(pointsCell);
-                    tableBody.appendChild(row);
-                }
-            });
-        } else {
+        if (!userData) {
             alert("No user data found. Please log in.");
             window.location.href = 'login.html';
         }
+
+        document.getElementById("userName").textContent = `${userData["First Name"]} ${userData["Last Name"]}`;
+        document.getElementById("userCommittee").textContent = userData["Committee"];
+        document.getElementById("generalPointsTotal").textContent = userData["Total General Points"] || 0;
+        document.getElementById("committeePointsTotal").textContent = userData["Total Committee Points"] || 0;
+
+        // Exclude irrelevant columns for the general points table
+        const excludeKeys = ["First Name", "Last Name", "Committee", "Email", "Graduating Class", "Prefect", "Total General Points", "Total Committee Points"];
+        const tableBody = document.getElementById("pointsTableBody");
+
+        Object.entries(userData).forEach(([key, value], index) => {
+            // Exclude keys listed in excludeKeys from general points
+            if (!excludeKeys.includes(key) && index > 0) {  // Skip the first column (index 0)
+                const row = document.createElement("tr");
+                const eventCell = document.createElement("td");
+                eventCell.textContent = key;
+                const pointsCell = document.createElement("td");
+                pointsCell.textContent = value || "0";
+                row.appendChild(eventCell);
+                row.appendChild(pointsCell);
+                tableBody.appendChild(row);
+            }
+        });
+
+        const committee = userData["Committee"];
+        const committeeMap = {
+            "Alumni Services": "alumni.csv",
+            "College Services": "college.csv",
+            "Community Services": "community.csv",
+            "Club Team Council": "ctc.csv",
+            "Fundraising": "fundraising.csv",
+            "Induction": "induction.csv",
+            "Mentoring": "mentoring.csv",
+            "Outreach": "outreach.csv",
+            "Parent Services": "parent.csv",
+            "School Environment Services": "ses.csv",
+            "Tours": "tours.csv",
+            "Tutoring": "tutoring.csv"
+        };
+
+        const committeeFile = committeeMap[committee];
+
+        if (committeeFile) {
+            fetch(committeeFile)
+                .then(response => response.text())
+                .then(csvText => {
+                    const lines = csvText.trim().split("\n").map(line => line.trim());
+                    const headers = lines[0].split(",").map(h => h.trim());
+                    const committeeRows = lines.slice(1);
+
+                    const fullName = `${userData["First Name"]} ${userData["Last Name"]}`.toLowerCase().trim();
+                    let matchedRow = null;
+
+                    for (let rowText of committeeRows) {
+                        const row = rowText.split(",").map(cell => cell.trim());
+                        if (row[0].toLowerCase().trim() === fullName) {
+                            matchedRow = row;
+                            break;
+                        }
+                    }
+
+                    if (matchedRow) {
+                        const committeeTableBody = document.getElementById("committeePointsTableBody");
+                        let totalCommitteePoints = 0; // To calculate the total committee points
+
+                        for (let i = 8; i < headers.length; i++) {
+                            const header = headers[i];
+                            const value = matchedRow[i] || "0";
+                            if (header && value) {
+                                const row = document.createElement("tr");
+                                const eventCell = document.createElement("td");
+                                eventCell.textContent = header;
+                                const pointsCell = document.createElement("td");
+                                pointsCell.textContent = value;
+                                row.appendChild(eventCell);
+                                row.appendChild(pointsCell);
+                                committeeTableBody.appendChild(row);
+
+                                // Add the points to the total committee points
+                                totalCommitteePoints += parseInt(value) || 0;  // Avoid NaN by handling non-numeric values
+                            }
+                        }
+
+                        // Update the total committee points on the dashboard
+                        document.getElementById("committeePointsTotal").textContent = totalCommitteePoints;
+                    }
+                });
+        }
     </script>
 </body>
-
 </html>

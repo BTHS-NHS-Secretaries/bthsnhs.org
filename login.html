@@ -2,18 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="./logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./logo.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
     <title>BTHS NHS Login</title>
 
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playwrite+BR:wght@100..400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playwrite+BR:wght@100..400&display=swap');
     </style>
-    
 </head>
 
 <body>
@@ -21,7 +19,7 @@
         <!-- Logo and Navigation Bar -->
         <div class="container">
             <div>
-                <img id="logo-image" src="logo.png" alt="BTHS NHS Logo">
+                <img id="logo-image" src="logo.png" alt="BTHS NHS Logo" />
             </div>
             <nav class="navbar">
                 <ul class="nav links">
@@ -44,17 +42,17 @@
             </nav>
         </div>
 
-        <hr/>
-
-        <h3><i>Enter your email to access your Member Points.</i></h3>
+        <hr />
+        <h3><i>Enter your email and password to access your Member Points.</i></h3>
     </header>
 
     <main>
         <div id="login">
-            <h1>Email Look Up</h1>
+            <h1>Member Points Sign In</h1>
             <form id="emailForm">
-                <input type="email" id="email" placeholder="Enter your email" required>
-                <button type="submit">Search</button>
+                <input type="email" id="email" placeholder="Enter your email" required />
+                <input type="password" id="password" placeholder="Enter your password" required />
+                <button type="submit">Login</button>
             </form>
         </div>
     </main>
@@ -66,30 +64,67 @@
     <script type="module">
         import { readCSV } from "./utils.js";
 
+        async function readUserCredentials(filePath) {
+            const response = await fetch(filePath);
+            const text = await response.text();
+            const rows = text.trim().split('\n').map(row => row.split(','));
+
+            const headers = rows[0];
+            const data = rows.slice(1).map(row => {
+                const entry = {};
+                row.forEach((cell, index) => {
+                    entry[headers[index].trim()] = cell.trim();
+                });
+                return entry;
+            });
+
+            return data;
+        }
+
         const emailForm = document.getElementById("emailForm");
         const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
 
         emailForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const email = emailInput.value.trim();
 
-            if (email) {
-                try {
-                    const members = await readCSV("./members.csv");
-                    const member = members.find((m) => m.Email.trim().toLowerCase() === email.toLowerCase());
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value.trim();
 
-                    if (member) {
-                        // Store user data in localStorage
-                        localStorage.setItem('userData', JSON.stringify(member));
-                        localStorage.setItem('userEmail', email); // Store email as well
-                        // Redirect to the dashboard page
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        alert("Email not found. Please try again.");
-                    }
-                } catch (error) {
-                    console.error("Error reading CSV:", error);
+            if (!email || !password) return;
+
+            try {
+                // Step 1: Validate email + password
+                const users = await readUserCredentials("users+password.csv");
+                const user = users.find(u => u.Email.toLowerCase() === email);
+
+                if (!user) {
+                    alert("Email not found.");
+                    return;
                 }
+
+                if (user.Password !== password) {
+                    alert("Incorrect password.");
+                    return;
+                }
+
+                // Step 2: Load member data (points, etc.)
+                const members = await readCSV("./members.csv");
+                const member = members.find(m => m.Email.trim().toLowerCase() === email);
+
+                if (!member) {
+                    alert("Member data not found.");
+                    return;
+                }
+
+                // Step 3: Store and redirect
+                localStorage.setItem('userData', JSON.stringify(member));
+                localStorage.setItem('userEmail', email);
+                window.location.href = 'dashboard.html';
+
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("An error occurred while logging in.");
             }
         });
     </script>
